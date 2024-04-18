@@ -1,0 +1,29 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+    <h1>Resultados de la búsqueda</h1>
+    <h3>Resultados para: {{ query }}</h3>
+
+    {% if articulos %}
+  
+        
+        <ul>
+            {% for articulo in articulos %}
+            <div class="col-md-6 col-11 mx-md-auto mx-3 mt-5 mb-5" style="border: 1px solid #ccc; border-radius: 5px; padding: 10px; margin: 0 auto;">
+                <li>
+                    <h2><a href="{% url 'articulo_extendido' articulo.id %}">{{ articulo.titulo }}</a></h2>
+                    {% if articulo.imagen %}
+                        <img src="/media/{{ articulo.imagen }}" alt="{{ articulo.titulo }}" class="img-fluid mb-3">
+                    {% endif %}
+                    <p>{{ articulo.contenido|truncatewords_html:50|safe }}</p>
+                    
+                </li>
+            </div>
+            {% endfor %}
+        </ul>
+        
+    
+    {% else %}
+        <p>No se encontraron resultados.</p>
+    {% endif %}
+{% endblock %}

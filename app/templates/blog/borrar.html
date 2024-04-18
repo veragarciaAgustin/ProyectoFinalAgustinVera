@@ -1,0 +1,21 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+
+    <div class="mx-2">
+        
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-11 mx-md-auto mx-3 mt-md-0 mt-3">
+            <h1>Borrar el posteo</h1>
+
+            <h3>Estas seguro que quieres borrar el posteo?</h3>
+
+            <form method="post" action="">
+                {% csrf_token %}
+                <button class="btn btn-primary" type="submit">Confirmar</button>
+                <a class="btn btn-primary" href="{% url 'inicio' %}">Cancelar</a>
+            </form>
+        </div>    
+    </div> 
+{% endblock content %}

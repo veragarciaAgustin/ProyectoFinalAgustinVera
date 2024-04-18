@@ -1,0 +1,104 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-md-4 col-12 mx-md-5 mx-2 mt-md-3 my-3">
+        <a class="btn btn-outline-secondary" href="{% url 'inicio' %}">Volver</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 col-11 mx-md-auto mb-3 pb-2 mx-3">
+        <h1>{{ object.titulo }}</h1>
+
+        {% if object.imagen %}
+            <img src="/media/{{ object.imagen }}" alt="{{ object.titulo }}" class="img-fluid mb-3">
+        {% endif %}
+
+        <p class="text-muted">{{ object.fecha }}</p>
+
+        <p class="text-muted">Publicado por {{ object.autor.username }}</p>
+
+        
+        <div>{{ object.contenido|safe }}</div>
+    </div>
+</div>
+
+<div class="row my-3">
+    <div class="col-md-6 col-12 mx-md-auto mx-3">
+        {% if request.user.username == object.autor.username %}
+            <div class="pb-3">
+                <a href="{% url 'borrar_articulo' object.pk %}">Borrar este posteo</a>
+            </div>
+        {% endif %}
+        <p>
+        {% if object.likes.count == 1 %}
+            <p>A {{ object.likes.count }} persona le ha gustado</p>
+        {% else %}
+            <p>A {{ object.likes.count }} personas les ha gustado</p>
+        {% endif %}
+
+        {% if request.user.is_authenticated %}
+            {% if liked_by_user %}
+                <form method="POST" action="{% url 'articulo_like' object.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-primary"><ion-icon name="heart-dislike-outline"></ion-icon>No te gusta este posteo</button>
+                </form>
+            {% else %}
+                <form method="POST" action="{% url 'articulo_like' object.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-primary"><ion-icon name="heart-outline"></ion-icon>Te gusta este posteo</button>
+                </form>
+            {% endif %}
+        {% else %}
+        <button class="btn btn-outline-primary" disabled>Ingresa para likear posteos</button>
+        {% endif%}
+        </p>
+    </div>
+</div>
+
+
+<div class="row my-3">
+    <div class="col-md-6 col-12 mx-md-auto mx-3">
+        <h3>Comentarios</h3>
+        {% for comentario in comentarios %}
+            
+            <div class="mb-3" style="border: 1px solid #ffffff; border-radius: 5px; padding: 10px;">
+                <strong>{{ comentario.usuario.username }} <small>ha comentado el</small> <small>{{ comentario.fecha }}</small></strong>
+                <p>{{ comentario.texto }}</p>
+                
+                <form method="POST" action="{% url 'comentario_like' comentario.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm {% if request.user in comentario.likes.all %}btn-primary{% else %}btn-outline-primary{% endif %}"><ion-icon name="heart-outline"></button>
+                </form>
+            
+                <small>Le ha gustado a {{ comentario.likes.count }} personas</small>
+                <form method="POST" action="{% url 'comentario_dislike' comentario.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm {% if request.user in comentario.dislikes.all %}btn-danger{% else %}btn-outline-danger{% endif %}"><ion-icon name="heart-dislike-outline"></button>
+                </form>
+                <small>No le ha gustado a {{ comentario.dislikes.count }} personas</small>
+            </div>
+            
+{% empty %}
+    <p>No hay comentarios aún.</p>
+{% endfor %}
+        {% if user.is_authenticated %}
+            <form method="POST" action="{% url 'agregar_comentario' object.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="comentario">Agregar comentario:</label>
+                    <textarea class="form-control" id="comentario" name="texto" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Comentar</button>
+            </form>
+        {% else %}
+            <p>Debes <a href="{% url 'login' %}">iniciar sesión</a> para comentar.</p>
+        {% endif %}
+        
+    </div>
+</div>
+
+
+{% endblock content %}
